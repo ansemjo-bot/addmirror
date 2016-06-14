@@ -80,12 +80,17 @@ hook="$bare/$hooks_dir/post-receive"
 # create file if neccessary
 if ! test -x $hook; then
     echo "create hook and mark as executable .."
-    touch "$hook"
+    echo >> "$hook"
     chmod +x "$hook"
 fi
+# add 'shebang'
+if ! grep "#!/" "$hook"; then
+    sed -i "1i #!/bin/sh" "$hook"
+fi
 # add git-push to hook
-if ! grep "$hash" "$hook"; then
-    echo "exec \"$gitbin\" push --quiet \"$hashed\" &" | tee --append "$hook"
+if ! grep "$hashed" "$hook"; then
+    echo -e "# mirror to '$remote':\nexec \"$gitbin\" push --quiet \"$hashed\" &" |\
+    tee --append "$hook"
 else
     echo "a hook for this hash already exists in '$hook'!"
 fi
