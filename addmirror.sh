@@ -68,6 +68,11 @@ else
 fi
 
 
+#### DRY-RUN TO CHECK PERMISSIONS ####
+info "Dry-run a push to verify you have write access ..."
+"$gitbin" -C "$bare" push "$hashed" --dry-run
+
+
 #### CREATE POST-RECEIVE HOOK ####
 info "Adding 'post-receive' hook ..."
 mkdir -p "$bare/$hooks_dir"
