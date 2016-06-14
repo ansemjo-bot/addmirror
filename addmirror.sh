@@ -14,7 +14,7 @@ set -e
 
 
 # print some info with bold '>>>' prefixed
-function info { echo -e "\e[1m>>>\e[0m $@ ..."; }
+function info { echo -e "\e[1m>>> $@ ...\e[0m"; }
 
 
 # check if local repository exists and is bare
@@ -26,13 +26,22 @@ fi
 
 # check if remote repo exists and is accessible
 info "Checking existence and access to remote repository"
-$gitbin ls-remote --quiet "$remote"
+"$gitbin" ls-remote --quiet "$remote"
 
 
 # hash the remote url
 info "Hashing remote url"
-hashed="$(printf "%s" "$remote" | $hashbin | awk '{print $1}')"
-echo "using '$hashed' as name"
+hashed="$(printf "%s" "$remote" | "$hashbin" | awk '{print $1}')"
+echo "using '$hashed' as hash"
+
+
+# add remote to local repository
+info "Adding remote to local repository"
+if ! "$gitbin" -C "$bare" remote -v | grep "$hashed.*push"; then
+    "$gitbin" -C "$bare" remote add "$hashed" "$remote"
+else
+    echo "a remote for this hash already exists in '$bare'!"
+fi
 
 
 # add post-receive hook
@@ -46,10 +55,10 @@ if ! test -x $hook; then
     chmod +x "$hook"
 fi
 # add git-push to hook
-if ! grep --quiet "$hash" "$hook"; then
-    echo "exec $gitbin push --quiet $hashed &" | tee --append "$hook"
+if ! grep "$hash" "$hook"; then
+    echo "exec \"$gitbin\" push --quiet \"$hashed\" &" | tee --append "$hook"
 else
-    echo "a hook for this url already exists in '$hook'!"
+    echo "a hook for this hash already exists in '$hook'!"
 fi
 
 
