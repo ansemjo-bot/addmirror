@@ -38,7 +38,7 @@ echo "using '$hashed' as hash"
 # add remote to local repository
 info "Adding remote to local repository"
 if ! "$gitbin" -C "$bare" remote -v | grep "$hashed.*push"; then
-    "$gitbin" -C "$bare" remote add "$hashed" "$remote"
+    "$gitbin" -C "$bare" remote add --mirror=push "$hashed" "$remote"
 else
     echo "a remote for this hash already exists in '$bare'!"
 fi
