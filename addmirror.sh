@@ -42,25 +42,25 @@ fi
 
 
 #### CHECK LOCAL REPOSITORY ####
-info "Checking existence of local bare repository"
+info "Checking existence of local bare repository ..."
 if ! test "$($gitbin -C "$bare" rev-parse --is-bare-repository)" == "true"; then
     echo "Repository '$bare' does not exist or is not a bare repository."; false;
 fi
 
 
 #### CHECK REMOTE REPOSITORY ####
-info "Checking existence and access to remote repository"
+info "Checking existence and access to remote repository ..."
 "$gitbin" ls-remote --quiet "$remote"
 
 
 #### HASH REMOTE URL ####
-info "Hashing remote url"
+info "Hashing remote url ..."
 hashed="$(printf "%s" "$remote" | "$hashbin" | awk '{print $1}')"
 echo "using '$hashed' as hash"
 
 
 #### ADD REMOTE URL AS MIRRORING REMOTE ####
-info "Adding remote to local repository"
+info "Adding remote to local repository ..."
 if ! "$gitbin" -C "$bare" remote -v | grep "$hashed.*push"; then
     "$gitbin" -C "$bare" remote add --mirror=push "$hashed" "$remote"
 else
@@ -69,7 +69,7 @@ fi
 
 
 #### CREATE POST-RECEIVE HOOK ####
-info "Adding 'post-receive' hook"
+info "Adding 'post-receive' hook ..."
 mkdir -p "$bare/$hooks_dir"
 hook="$bare/$hooks_dir/post-receive"
 # create file if neccessary
