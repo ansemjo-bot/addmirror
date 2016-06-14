@@ -19,7 +19,14 @@ set -e
 
 
 # function to print some info in bold with '>>>' prefixed
-function info { echo -e "\e[1m>>> $@ ...\e[0m"; }
+function info { echo -e "\e[1m>>> $@\e[0m"; }
+
+
+#### CHECK PRESENCE OF VARIABLES ####
+if test -z "$bare" -o -z "$remote"; then
+    info "USAGE: $0 </path/to/local/bare/repo> <remote-url>"
+    false
+fi
 
 
 #### CHECK EFFECTIVE UID ####
