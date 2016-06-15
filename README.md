@@ -27,22 +27,30 @@ In case your remote repository is hosted on GitHub you basically follow their
 guide on [managing deploy keys][deploy_user]. I chose to create a seperate user
 on GitHub and add this user as a collaborator on the repositories I want to mirror.
 
-Either way, it usually consists of creating a new set of SSH keys and granting
-the appropriate public key write access. I chose 'ed25519' keys here.
+Either way, it usually consists of [creating a new set][ssh-keygen] of SSH keys
+and granting the appropriate public key write access. In my case I chose no
+passphrase as the user account usually has no possibility of user interaction.
+Alternatively you could set up an ssh-agent and enter the passphrase once every
+boot. But you'd need to somehow ensure that the agent still works after x days.
 
-_(The commands follow this format: `<user> <current dir> $ <command>`)_
+Another particularity I stumbled upon was OpenSSH's connection multiplexing.
+My usual SSH config includes `ControlMaster auto` which means that the first
+connection will create a master socket and background that. All following
+connections will use that socket and thus avoid the need for repeated authentication
+and key exchange. However, the backgrounding seems to cause problems with GitLab's
+unicorn worker threads: I consistently got timeouts, killed threads and 504 errors
+in the browser. Thus disable connection multiplexing altogether in 
+`~git/.ssh/config`:
 
-## generate ssh keys
 ```
-user ~ $ sudo su - git -s /bin/bash
-git ~ $ ssh-keygen -t ed25519 -C "deploy bot" -f ~/.ssh/id_ed25519
+Host *
+    IdentityFile ~/.ssh/id_ed25519
+    ForwardAgent no
+    
+    ControlPath none
+    ControlMaster no
+    ControlPersist no
 ```
-
-In this case you should chose no passphrase or otherwise find a reliable way to
-avoid having to input a passphrase upon connection as this is a machine user with
-no human interaction possible.
-
-
 
 
 <!--Links:-->
@@ -50,3 +58,4 @@ no human interaction possible.
 [blogpost]: https://smcleod.net/mirror-gitlab-to-github/ "Mirror GitLab to GitHub"
 [custom_hooks]: http://docs.gitlab.com/ce/hooks/custom_hooks.html "GitLab: custom_hooks"
 [deploy_user]: https://developer.github.com/guides/managing-deploy-keys/#machine-users "GitHub: managing deploy keys"
+[ssh-keygen]: https://help.github.com/articles/generating-an-ssh-key/ "Generate an SSH key"
