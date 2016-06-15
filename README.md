@@ -71,12 +71,47 @@ user 'username':
 
 ```
 git ~ $ cd repositories/username/testproject.git
-git testproject.git $ git remote add mirror git@github.com:username/mirror.git
+git testproject.git $ git remote add --mirror=push mirror git@github.com:username/mirror.git
 ```
 
 _Subsitute with any other hosted repository service as you wish._
 
+# 3. Add post-receive hook
 
+Now add a post-receive hook in the bare repository, which pushes to the remote we
+just set up after any received push. As noted above, GitLab uses a custom
+directory `custom_hooks` within the bare repository for user-defined hooks because
+the usual `hooks` directory is symlinked to some GitLab-specific Ruby code.
+
+Thus create an executable file `post-receive` in
+`.../testproject.git/custom_hooks/` ..
+
+```
+git testproject.git $ mkdir custom_hooks
+git testproject.git $ touch custom_hooks/post-receive
+git testproject.git $ chmod +x custom_hooks/post-receive
+```
+
+.. and add the following lines:
+
+```
+#!/bin/sh
+exec git push --quiet "mirror" &
+```
+
+Now, every time you push to your GitLab repository this script is executed and
+the repository is mirrored to GitHub.
+
+# The script
+
+The script automates the last two steps and verifys that you have proper write
+permissions with a push dry-run.
+
+Execute it as your GitLab user with:
+
+```
+git ~ $ ./addmirror.sh repositories/username/testrepo.git git@github.com:username/mirror.git
+```
 
 <!--Links:-->
 [hooks]: https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks
