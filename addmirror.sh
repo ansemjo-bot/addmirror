@@ -30,8 +30,10 @@ fi
 
 
 #### CHECK EFFECTIVE UID ####
-if ! test "$EUID" == "$(id -u git)"; then
+if ! test "$EUID" == "$(id -u "$gituser")"; then
     info "You are not running as user '$gituser'!";
+    echo "Running this as any other user than the repository owner could"
+    echo "corrupt file permissions and break functionality."
     read -n 1 -p "Are you sure you want to continue? [y/n] " sure
     if test "$sure" == "y"; then
         echo "es" #yes
