@@ -52,6 +52,31 @@ Host *
     ControlPersist no
 ```
 
+Afterwards, check if you have access at all with something like:
+
+```
+git ~ $ ssh git@github.com
+Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+# 2. Set up the remote
+
+I set up remotes in repositories of a GitLab installation on Arch Linux. The path
+to the repositories is `/var/lib/gitlab/repositories/...` in this case.
+
+Set up a new repository on GitHub and add your machine user as a collaborator.
+Find the correct bare repository on the filesystem and add the SSH clone URL of
+this new repository as a remote. For example, a GitLab project 'testproject' of
+user 'username':
+
+```
+git ~ $ cd repositories/username/testproject.git
+git testproject.git $ git remote add mirror git@github.com:username/mirror.git
+```
+
+_Subsitute with any other hosted repository service as you wish._
+
+
 
 <!--Links:-->
 [hooks]: https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks
