@@ -104,7 +104,7 @@ the repository is mirrored to GitHub.
 
 # The script
 
-The script automates the last two steps and verifys that you have proper write
+The script automates the last two steps and verifies that you have proper write
 permissions with a push dry-run.
 
 Execute it as your GitLab user with:
